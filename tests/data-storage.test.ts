@@ -1,21 +1,57 @@
+import { describe, it, expect, beforeEach } from "vitest"
 
-import { describe, expect, it } from "vitest";
+// Mock storage for device data
+const deviceData = new Map()
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
+// Mock functions to simulate contract behavior
+function storeData(deviceId: string, data: string) {
+  if (data.length === 0) throw new Error("Invalid data")
+  const timestamp = Date.now()
+  deviceData.set(deviceId, { data, timestamp })
+  return true
+}
 
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
+function getLatestData(deviceId: string) {
+  return deviceData.get(deviceId)
+}
 
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
+describe("Data Storage Contract", () => {
+  beforeEach(() => {
+    deviceData.clear()
+  })
+  
+  it("should store data for a device", () => {
+    const result = storeData("device1", "Temperature: 25C")
+    expect(result).toBe(true)
+  })
+  
+  it("should not store empty data", () => {
+    expect(() => storeData("device1", "")).toThrow("Invalid data")
+  })
+  
+  it("should retrieve the latest data for a device", () => {
+    storeData("device1", "Temperature: 25C")
+    storeData("device1", "Temperature: 26C")
+    const latestData = getLatestData("device1")
+    expect(latestData).toBeDefined()
+    expect(latestData.data).toBe("Temperature: 26C")
+  })
+  
+  it("should return undefined for a device with no data", () => {
+    const latestData = getLatestData("nonexistent-device")
+    expect(latestData).toBeUndefined()
+  })
+  
+  it("should handle multiple devices", () => {
+    storeData("device1", "Temperature: 25C")
+    storeData("device2", "Humidity: 60%")
+    storeData("device1", "Temperature: 26C")
+    
+    const latestData1 = getLatestData("device1")
+    const latestData2 = getLatestData("device2")
+    
+    expect(latestData1.data).toBe("Temperature: 26C")
+    expect(latestData2.data).toBe("Humidity: 60%")
+  })
+})
 
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});

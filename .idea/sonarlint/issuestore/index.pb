@@ -7,3 +7,5 @@ Q
 !tests/device-registration.test.ts,e/9/e93fb2a5e55c1d2b7f63f3fd2ee4fa29126d3d79
 K
 contracts/data-storage.clar,f/3/f3bc9230856c3884086032a9d33994af84d526e2
+J
+tests/data-storage.test.ts,2/e/2e08f1f464eac62cbf360b62e34fc97730adf9b6
